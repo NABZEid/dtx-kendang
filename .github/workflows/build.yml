@@ -26,6 +26,18 @@ jobs:
             if [ -f "$f" ]; then sed -i -E 's/minSdk(Version)?( *=)? *flutter\.minSdkVersion/minSdk = 24/' "$f"; fi
           done
           sed -i 's/android:label="dtx_kendang"/android:label="DTX Kendang"/' android/app/src/main/AndroidManifest.xml || true
+      - name: Paksa compileSdk 36 untuk semua plugin
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat > ~/.gradle/init.d/force-sdk.gradle <<'EOF'
+          allprojects {
+            afterEvaluate { p ->
+              if (p.hasProperty('android')) {
+                p.android.compileSdkVersion 36
+              }
+            }
+          }
+          EOF
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
